@@ -1,11 +1,14 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-android")
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
     namespace = "com.mateus.orders"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.mateus.orders"
@@ -44,4 +47,26 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    val retrofitVersion = "2.9.0"
+    implementation ("com.squareup.retrofit2:retrofit:$retrofitVersion")
+
+    val gsonVersion = "2.10.1"
+    implementation ("com.squareup.retrofit2:converter-gson:$gsonVersion")
+
+    val roomVersion = "2.4.1"
+    implementation("androidx.room:room-runtime:$roomVersion")
+    annotationProcessor("androidx.room:room-compiler:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
+    testImplementation("androidx.room:room-testing:$roomVersion")
+//    implementation("androidx.room:room-paging:$roomVersion")
+
+    val daggerHiltVersion = "2.44"
+    implementation("com.google.dagger:hilt-android:$daggerHiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$daggerHiltVersion")
+}
+
+kapt {
+    correctErrorTypes = true
 }
