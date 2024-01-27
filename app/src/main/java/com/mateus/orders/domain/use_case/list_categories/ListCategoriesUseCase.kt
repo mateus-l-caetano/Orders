@@ -10,5 +10,16 @@ import javax.inject.Inject
 class ListCategoriesUseCase @Inject constructor(
     private val repository: ICategoryRepository
 ) : IListCategoriesUseCase {
-    override fun invoke(): Flow<Resource<List<Category>>> = flow { emit(Resource.Success(listOf())) }
+    override fun invoke(): Flow<Resource<List<Category>>> = flow {
+        emit(Resource.Loading())
+        try {
+            repository.getCategories().collect { categoriesList ->
+                emit(Resource.Success(categoriesList))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(
+                message = e.message ?: "Erro ao carregar categorias"
+            ))
+        }
+    }
 }

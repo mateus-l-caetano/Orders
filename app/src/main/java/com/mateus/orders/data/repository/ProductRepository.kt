@@ -1,6 +1,5 @@
 package com.mateus.orders.data.repository
 
-import android.util.Log
 import com.mateus.orders.data.local.Database
 import com.mateus.orders.data.local.entity.toProduct
 import com.mateus.orders.data.remote.IFakeRemoteService
@@ -29,13 +28,6 @@ class ProductRepository @Inject constructor(
 
     private suspend fun getFromApi() {
         val products = orderService.getProducts()
-        Log.d("ProductRepository products from API size", products.size.toString())
-//        products.forEach {
-//            Log.d("saving product", it.toString())
-//            database.productDao().saveProducts(
-//                it
-//            )
-//        }
         database.productDao().saveProducts(products = products.toTypedArray())
     }
 }

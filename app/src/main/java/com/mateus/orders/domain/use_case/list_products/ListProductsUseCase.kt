@@ -15,14 +15,12 @@ class ListProductsUseCase @Inject constructor(
         emit(Resource.Loading())
         try {
             repository.getProducts(categoryIds).collect { productsList ->
-                Log.d("ListProductsUseCase size", productsList.size.toString())
                 emit(Resource.Success(productsList))
             }
         } catch (e : Exception){
-            Resource.Error(
-                e.message ?: "Erro ao buscar produtos",
-                listOf<Product>()
-            )
+            emit(Resource.Error(
+                message = e.message ?: "Erro ao buscar produtos"
+            ))
         }
     }
 

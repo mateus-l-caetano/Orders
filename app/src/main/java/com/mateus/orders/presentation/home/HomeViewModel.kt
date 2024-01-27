@@ -26,8 +26,12 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            loadCategories()
-            loadProducts()
+            launch {
+                loadCategories()
+            }
+            launch {
+                loadProducts()
+            }
         }
     }
 
@@ -56,10 +60,10 @@ class HomeViewModel @Inject constructor(
             when(productsFlow) {
                 is Resource.Loading -> {}
                 is Resource.Success -> {
-                    Log.d("viewmodel loadcategories products size", productsFlow.data?.size.toString())
                     products.value = productsFlow.data.orEmpty()
                 }
-                is Resource.Error -> {}
+                is Resource.Error -> {
+                }
             }
         }
     }
