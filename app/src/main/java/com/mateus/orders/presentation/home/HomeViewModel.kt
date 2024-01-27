@@ -12,6 +12,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,8 +22,8 @@ class HomeViewModel @Inject constructor(
     private val listCategoriesUseCase: IListCategoriesUseCase,
     private val listProductsUseCase: IListProductsUseCase
 ) : ViewModel() {
-    private val categories = MutableStateFlow(listOf<Category>())
-    private val products = MutableStateFlow(listOf<Product>())
+    private val categories: MutableStateFlow<Resource<List<Category>>> = MutableStateFlow(Resource.Loading())
+    private val products: MutableStateFlow<Resource<List<Product>>> = MutableStateFlow(Resource.Loading())
     private val categoriesToFilter = mutableListOf<Int>()
 
     init {
@@ -49,36 +51,23 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun getCategories(): Flow<List<Category>> {
-        return categories
+    fun getCategories(): StateFlow<Resource<List<Category>>> {
+        return categories.asStateFlow()
     }
 
-    fun getProducts() : Flow<List<Product>> {
-        return products
+    fun getProducts() : StateFlow<Resource<List<Product>>> {
+        return products.asStateFlow()
     }
 
     private suspend fun loadCategories() {
         listCategoriesUseCase().collect { categoriesFlow ->
-            when(categoriesFlow) {
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    categories.value = categoriesFlow.data.orEmpty()
-                }
-                is Resource.Error -> {}
-            }
+            categories.value = categoriesFlow
         }
     }
 
     private suspend fun loadProducts() {
         listProductsUseCase(categoriesToFilter).collect { productsFlow ->
-            when(productsFlow) {
-                is Resource.Loading -> {}
-                is Resource.Success -> {
-                    products.value = productsFlow.data.orEmpty()
-                }
-                is Resource.Error -> {
-                }
-            }
+            products.value = productsFlow
         }
     }
 }

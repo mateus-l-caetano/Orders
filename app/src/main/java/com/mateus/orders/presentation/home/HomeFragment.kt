@@ -15,6 +15,7 @@ import com.mateus.orders.domain.model.Category
 import com.mateus.orders.domain.model.Product
 import com.mateus.orders.presentation.home.adapter.CategoriesAdapter
 import com.mateus.orders.presentation.home.adapter.ProductsAdapter
+import com.mateus.orders.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -54,31 +55,48 @@ class HomeFragment : Fragment() {
 
     private suspend fun getCategories(categoriesDataSet: MutableList<Category>) {
         viewModel.getCategories().collect { categories ->
-            categoriesDataSet.clear()
-            categoriesDataSet.addAll(categories)
+            when(categories) {
+                is Resource.Loading -> {}
+                is Resource.Error -> {}
+                is Resource.Success -> {
+                    categoriesDataSet.clear()
+                    categoriesDataSet.addAll(categories.data.orEmpty())
 
-            val categoriesAdapter = CategoriesAdapter(
-                categoriesDataSet.toList()
-            ) { isSelected, categoryId ->
-                if (!isSelected)
-                    viewModel.removeCategoriesFilter(categoryId)
-                else
-                    viewModel.addCategoriesFilter(categoryId)
+                    val categoriesAdapter = CategoriesAdapter(
+                        categoriesDataSet.toList()
+                    ) { isSelected, categoryId ->
+                        if (!isSelected)
+                            viewModel.removeCategoriesFilter(categoryId)
+                        else
+                            viewModel.addCategoriesFilter(categoryId)
+                    }
+
+                    val categoriesRecyclerView = binding.successHomeLayout.categoriesRecyclerview
+                    categoriesRecyclerView.adapter = categoriesAdapter
+                }
             }
-
-            val categoriesRecyclerView = binding.categoriesRecyclerview
-            categoriesRecyclerView.adapter = categoriesAdapter
         }
     }
 
     private suspend fun getProducts(productsDataSet: MutableList<Product>) {
         viewModel.getProducts().collect { products ->
-            productsDataSet.clear()
-            productsDataSet.addAll(products)
+            when(products) {
+                is Resource.Error -> {
+                    binding.homeFlipper.displayedChild = 2
+                }
+                is Resource.Loading -> {
+                    binding.homeFlipper.displayedChild = 1
+                }
+                is Resource.Success -> {
+                    binding.homeFlipper.displayedChild = 0
+                    productsDataSet.clear()
+                    productsDataSet.addAll(products.data.orEmpty())
 
-            val productsAdapter = ProductsAdapter(productsDataSet.toList())
-            val productsRecyclerView = binding.productsRecyclerview
-            productsRecyclerView.adapter = productsAdapter
+                    val productsAdapter = ProductsAdapter(productsDataSet.toList())
+                    val productsRecyclerView = binding.successHomeLayout.productsRecyclerview
+                    productsRecyclerView.adapter = productsAdapter
+                }
+            }
         }
     }
 
