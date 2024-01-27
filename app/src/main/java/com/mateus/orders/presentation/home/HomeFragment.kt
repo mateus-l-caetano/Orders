@@ -39,23 +39,7 @@ class HomeFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 launch {
-                    viewModel.getCategories().collect { categories ->
-                        categoriesDataSet.clear()
-                        categoriesDataSet.addAll(categories)
-
-                        val categoriesAdapter = CategoriesAdapter(
-                            categoriesDataSet.toList()
-                        ) { isSelected, categoryId ->
-                            Log.d("aaa", "isSelected $isSelected categoryId $categoryId")
-                            if (!isSelected)
-                                viewModel.removeCategoriesFilter(categoryId)
-                            else
-                                viewModel.addCategoriesFilter(categoryId)
-                        }
-
-                        val categoriesRecyclerView = binding.categoriesRecyclerview
-                        categoriesRecyclerView.adapter = categoriesAdapter
-                    }
+                    getCategories(categoriesDataSet)
                 }
 
                 launch {
@@ -66,6 +50,25 @@ class HomeFragment : Fragment() {
         }
 
         return view
+    }
+
+    private suspend fun getCategories(categoriesDataSet: MutableList<Category>) {
+        viewModel.getCategories().collect { categories ->
+            categoriesDataSet.clear()
+            categoriesDataSet.addAll(categories)
+
+            val categoriesAdapter = CategoriesAdapter(
+                categoriesDataSet.toList()
+            ) { isSelected, categoryId ->
+                if (!isSelected)
+                    viewModel.removeCategoriesFilter(categoryId)
+                else
+                    viewModel.addCategoriesFilter(categoryId)
+            }
+
+            val categoriesRecyclerView = binding.categoriesRecyclerview
+            categoriesRecyclerView.adapter = categoriesAdapter
+        }
     }
 
     private suspend fun getProducts(productsDataSet: MutableList<Product>) {

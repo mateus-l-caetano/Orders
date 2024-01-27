@@ -37,7 +37,6 @@ class HomeViewModel @Inject constructor(
 
     fun addCategoriesFilter(category: Int) {
         categoriesToFilter.add(category)
-        Log.d("aaa", "adding categoryId $category")
         viewModelScope.launch(Dispatchers.IO) {
             loadProducts()
         }
@@ -45,7 +44,6 @@ class HomeViewModel @Inject constructor(
 
     fun removeCategoriesFilter(category: Int) {
         categoriesToFilter.remove(category)
-        Log.d("aaa", "removing categoryId $category")
         viewModelScope.launch(Dispatchers.IO) {
             loadProducts()
         }
