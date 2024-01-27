@@ -7,5 +7,5 @@ import java.time.LocalDateTime
 @Entity(tableName = "order")
 data class OrderEntity(
     @PrimaryKey val id: Int,
-    val date: LocalDateTime,
+    val date: String,
 )

@@ -1,5 +1,6 @@
 package com.mateus.orders.domain.use_case.list_products
 
+import android.util.Log
 import com.mateus.orders.domain.model.Product
 import com.mateus.orders.domain.repository.IProductRepository
 import com.mateus.orders.utils.Resource
@@ -10,8 +11,19 @@ import javax.inject.Inject
 class ListProductsUseCase @Inject constructor(
     private val repository: IProductRepository
 ) : IListProductsUseCase {
-    override fun invoke(): Flow<Resource<List<Product>>> = flow {
-        emit(Resource.Success(listOf()))
+    override fun invoke(categoryIds: List<Int>): Flow<Resource<List<Product>>> = flow {
+        emit(Resource.Loading())
+        try {
+            repository.getProducts(categoryIds).collect { productsList ->
+                Log.d("ListProductsUseCase size", productsList.size.toString())
+                emit(Resource.Success(productsList))
+            }
+        } catch (e : Exception){
+            Resource.Error(
+                e.message ?: "Erro ao buscar produtos",
+                listOf<Product>()
+            )
+        }
     }
 
 }

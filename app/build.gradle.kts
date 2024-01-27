@@ -36,6 +36,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    viewBinding {
+        enable = true
+    }
 }
 
 dependencies {
@@ -50,9 +54,7 @@ dependencies {
 
     val retrofitVersion = "2.9.0"
     implementation ("com.squareup.retrofit2:retrofit:$retrofitVersion")
-
-    val gsonVersion = "2.10.1"
-    implementation ("com.squareup.retrofit2:converter-gson:$gsonVersion")
+    implementation ("com.squareup.retrofit2:converter-gson:$retrofitVersion")
 
     val roomVersion = "2.4.1"
     implementation("androidx.room:room-runtime:$roomVersion")
@@ -62,9 +64,13 @@ dependencies {
     testImplementation("androidx.room:room-testing:$roomVersion")
 //    implementation("androidx.room:room-paging:$roomVersion")
 
-    val daggerHiltVersion = "2.44"
+    val daggerHiltVersion = "2.48.1"
     implementation("com.google.dagger:hilt-android:$daggerHiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$daggerHiltVersion")
+
+    val nav_version = "2.5.3"
+    implementation("androidx.navigation:navigation-fragment-ktx:$nav_version")
+    implementation("androidx.navigation:navigation-ui-ktx:$nav_version")
 }
 
 kapt {

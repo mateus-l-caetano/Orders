@@ -5,5 +5,5 @@ import com.mateus.orders.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface IListProductsUseCase {
-    operator fun invoke() : Flow<Resource<List<Product>>>
+    operator fun invoke(categoryIds: List<Int>) : Flow<Resource<List<Product>>>
 }
