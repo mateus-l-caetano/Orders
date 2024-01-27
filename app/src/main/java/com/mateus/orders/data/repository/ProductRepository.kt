@@ -26,6 +26,11 @@ class ProductRepository @Inject constructor(
             }
     }
 
+    override suspend fun getProductById(id: Int): Flow<Product> {
+        return database.productDao()
+            .getProductById(id).map { it.toProduct() }
+    }
+
     override suspend fun getProductsByCategory(categoryIds: List<Int>): Flow<List<Product>> {
         return database.productDao()
             .getProductsByCategory(categoryIds.toIntArray()).map { productsList ->
