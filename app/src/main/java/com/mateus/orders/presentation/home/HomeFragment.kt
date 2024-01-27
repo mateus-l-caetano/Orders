@@ -1,6 +1,7 @@
 package com.mateus.orders.presentation.home
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,27 +43,40 @@ class HomeFragment : Fragment() {
                         categoriesDataSet.clear()
                         categoriesDataSet.addAll(categories)
 
-                        val categoriesAdapter = CategoriesAdapter(categoriesDataSet.toList())
+                        val categoriesAdapter = CategoriesAdapter(
+                            categoriesDataSet.toList()
+                        ) { isSelected, categoryId ->
+                            Log.d("aaa", "isSelected $isSelected categoryId $categoryId")
+                            if (!isSelected)
+                                viewModel.removeCategoriesFilter(categoryId)
+                            else
+                                viewModel.addCategoriesFilter(categoryId)
+                        }
+
                         val categoriesRecyclerView = binding.categoriesRecyclerview
                         categoriesRecyclerView.adapter = categoriesAdapter
                     }
                 }
 
                 launch {
-                    viewModel.getProducts().collect { products ->
-                        productsDataSet.clear()
-                        productsDataSet.addAll(products)
-
-                        val productsAdapter = ProductsAdapter(productsDataSet.toList())
-                        val productsRecyclerView = binding.productsRecyclerview
-                        productsRecyclerView.adapter = productsAdapter
-                    }
+                    getProducts(productsDataSet)
                 }
 
             }
         }
 
         return view
+    }
+
+    private suspend fun getProducts(productsDataSet: MutableList<Product>) {
+        viewModel.getProducts().collect { products ->
+            productsDataSet.clear()
+            productsDataSet.addAll(products)
+
+            val productsAdapter = ProductsAdapter(productsDataSet.toList())
+            val productsRecyclerView = binding.productsRecyclerview
+            productsRecyclerView.adapter = productsAdapter
+        }
     }
 
     override fun onDestroyView() {

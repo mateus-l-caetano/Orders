@@ -22,7 +22,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val categories = MutableStateFlow(listOf<Category>())
     private val products = MutableStateFlow(listOf<Product>())
-    private val categoriesToFilter = listOf<Int>()
+    private val categoriesToFilter = mutableListOf<Int>()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
@@ -32,6 +32,22 @@ class HomeViewModel @Inject constructor(
             launch {
                 loadProducts()
             }
+        }
+    }
+
+    fun addCategoriesFilter(category: Int) {
+        categoriesToFilter.add(category)
+        Log.d("aaa", "adding categoryId $category")
+        viewModelScope.launch(Dispatchers.IO) {
+            loadProducts()
+        }
+    }
+
+    fun removeCategoriesFilter(category: Int) {
+        categoriesToFilter.remove(category)
+        Log.d("aaa", "removing categoryId $category")
+        viewModelScope.launch(Dispatchers.IO) {
+            loadProducts()
         }
     }
 

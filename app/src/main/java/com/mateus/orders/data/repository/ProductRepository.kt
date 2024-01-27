@@ -13,7 +13,7 @@ class ProductRepository @Inject constructor(
     private val database: Database,
     private val orderService: IFakeRemoteService
     ) : IProductRepository {
-    override suspend fun getProducts(categoryIds: List<Int>): Flow<List<Product>> {
+    override suspend fun getProducts(): Flow<List<Product>> {
         return database.productDao()
             .getProducts().map { productsListFromRoom ->
                 if(productsListFromRoom.isEmpty()){
@@ -24,6 +24,14 @@ class ProductRepository @Inject constructor(
                     productEntity.toProduct()
                 }
             }
+    }
+
+    override suspend fun getProductsByCategory(categoryIds: List<Int>): Flow<List<Product>> {
+        return database.productDao()
+            .getProductsByCategory(categoryIds.toIntArray()).map { productsList ->
+                productsList.map { productEntity -> productEntity.toProduct()
+            }
+        }
     }
 
     private suspend fun getFromApi() {
