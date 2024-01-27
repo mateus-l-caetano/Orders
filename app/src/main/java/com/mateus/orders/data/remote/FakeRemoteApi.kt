@@ -19,7 +19,7 @@ class FakeRemoteApi @Inject constructor() : IFakeRemoteService {
                     name = "product $i",
                     description = "The product $i is a very nice product",
                     price = BigDecimal(i).toString(),
-                    categoryId = i % 5
+                    categoryId = ((i - 1) % 5) + 1
                 )
             )
         }
