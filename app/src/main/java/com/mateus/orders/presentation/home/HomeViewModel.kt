@@ -27,7 +27,7 @@ class HomeViewModel @Inject constructor(
     private val categories: MutableStateFlow<Resource<List<Category>>> = MutableStateFlow(Resource.Loading())
     private val products: MutableStateFlow<Resource<List<Product>>> = MutableStateFlow(Resource.Loading())
     private val currentOrderId: MutableStateFlow<Resource<Int>> = MutableStateFlow(Resource.Loading())
-    private val addOrderItemState: MutableStateFlow<Resource<Boolean>> = MutableStateFlow(Resource.Loading())
+    private val addOrderItemState: MutableStateFlow<Resource<Any>> = MutableStateFlow(Resource.Loading())
     private val categoriesToFilter = mutableListOf<Int>()
 
     init {
@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor(
         return currentOrderId.asStateFlow()
     }
 
-    fun getAddOrderItemState() : StateFlow<Resource<Boolean>> {
+    fun getAddOrderItemState() : StateFlow<Resource<Any>> {
         return addOrderItemState.asStateFlow()
     }
 

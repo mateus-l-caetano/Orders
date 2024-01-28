@@ -5,5 +5,5 @@ import com.mateus.orders.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface IAddOrderItemUseCase {
-    operator fun invoke(orderId: Int, productId: Int) : Flow<Resource<Boolean>>
+    operator fun invoke(orderId: Int, productId: Int) : Flow<Resource<Any>>
 }

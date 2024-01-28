@@ -15,7 +15,7 @@ class AddOrderItemUseCase @Inject constructor(
     private val orderItemRepository: IOrderItemRepository,
     private val orderToOrderItemRepository: IOrderToOrderItemRepository
 ) : IAddOrderItemUseCase {
-    override fun invoke(orderId: Int, productId: Int): Flow<Resource<Boolean>> = flow {
+    override fun invoke(orderId: Int, productId: Int): Flow<Resource<Any>> = flow {
         emit(Resource.Loading())
         try {
             val orderItem = orderItemRepository.getOrderItemByOrderIdAndProductId(orderId, productId).firstOrNull()
@@ -29,7 +29,7 @@ class AddOrderItemUseCase @Inject constructor(
                 orderToOrderItemRepository.addOrderToOrderItem(
                     OrderToOrderItem(orderId, orderItemId)
                 )
-                emit(Resource.Success(true))
+                emit(Resource.Success(Any()))
             } else {
                 orderItemRepository.updateOrderItem(
                     OrderItem(

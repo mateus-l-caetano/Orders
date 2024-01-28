@@ -1,7 +1,6 @@
 package com.mateus.orders.presentation.home
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,9 +26,6 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: HomeViewModel by viewModels()
-
-//    private lateinit var addOrderItemStateObserver:
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,52 +55,35 @@ class HomeFragment : Fragment() {
                 }
 
                 launch {
-                    viewModel.getCurrentOrderId().collect { orderIdResource ->
-                        when(orderIdResource) {
-                            is Resource.Success -> {
-                                Toast.makeText(context, "Pedido atual carregado", Toast.LENGTH_LONG).show()
-                            }
-                            is Resource.Error -> {
-                                Toast.makeText(context, "${orderIdResource.message}", Toast.LENGTH_LONG).show()
-                            }
-                            is Resource.Loading -> {
-//                                Toast.makeText(context, "Carregando pedido atual", Toast.LENGTH_LONG).show()
-                            }
-                        }
-                    }
+                    getCurrentOrder()
                 }
 
             }
         }
 
-//        val addOrderItemStateObserver = viewModel.getAddOrderItemState().
-//        { wasProductAdded ->
-//            when (wasProductAdded) {
-//                is Resource.Error -> {
-//                    Toast.makeText(context, "${wasProductAdded.message}", Toast.LENGTH_LONG).show()
-//                    Log.d("aaa", "${wasProductAdded.message}")
-//                }
-//                is Resource.Loading -> {
-////                                        Toast.makeText(context, "Adicionando produto", Toast.LENGTH_LONG).show()
-//                }
-//                is Resource.Success -> {
-//                    if(wasProductAdded.data == true)
-//                        Toast.makeText(context, "Produto adicionado com sucesso", Toast.LENGTH_LONG).show()
-//                    else
-//                        Toast.makeText(context, "Não foi possível adicionar o produto", Toast.LENGTH_LONG).show()
-//                }
-//            }
-//        }
-
         return view
+    }
+
+    private suspend fun getCurrentOrder() {
+        viewModel.getCurrentOrderId().collect { orderIdResource ->
+            when (orderIdResource) {
+                is Resource.Success -> {
+                    Toast.makeText(context, "Pronto para adicionar itens ao pedido", Toast.LENGTH_SHORT).show()
+                }
+
+                is Resource.Error -> {
+                    Toast.makeText(context, "${orderIdResource.message}", Toast.LENGTH_LONG).show()
+                }
+
+                is Resource.Loading -> {}
+            }
+        }
     }
 
     private suspend fun getCategories(categoriesDataSet: MutableList<Category>) {
         viewModel.getCategories().collect { categories ->
             when(categories) {
-                is Resource.Loading -> {
-//                    Toast.makeText(context, "Carregando categorias", Toast.LENGTH_LONG).show()
-                }
+                is Resource.Loading -> {}
                 is Resource.Error -> {
                     Toast.makeText(context, "${categories.message}", Toast.LENGTH_LONG).show()
                 }
@@ -144,6 +123,17 @@ class HomeFragment : Fragment() {
 
                     val productsAdapter = ProductsAdapter(productsDataSet.toList()) { productId ->
                         viewModel.addOrderItem(productId)
+
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            viewModel.getAddOrderItemState().collect { wasProductAdded ->
+                                when (wasProductAdded) {
+                                    is Resource.Error -> {
+                                        Toast.makeText(context, "${wasProductAdded.message}", Toast.LENGTH_LONG).show()
+                                    }
+                                    else -> {}
+                                }
+                            }
+                        }
                     }
 
                     val productsRecyclerView = binding.successHomeLayout.productsRecyclerview
