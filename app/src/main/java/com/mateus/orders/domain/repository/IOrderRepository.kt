@@ -4,5 +4,7 @@ import com.mateus.orders.domain.model.Order
 import kotlinx.coroutines.flow.Flow
 
 interface IOrderRepository {
-    suspend fun invoke(): Flow<Order>
+    suspend fun addOrder(order: Order) : Long
+
+    suspend fun getCurrentOrder() : Flow<Order?>
 }

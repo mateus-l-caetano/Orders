@@ -1,12 +1,13 @@
 package com.mateus.orders.presentation.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mateus.orders.domain.model.Category
 import com.mateus.orders.domain.model.Product
+import com.mateus.orders.domain.use_case.add_order_item.IAddOrderItemUseCase
 import com.mateus.orders.domain.use_case.list_categories.IListCategoriesUseCase
 import com.mateus.orders.domain.use_case.list_products.IListProductsUseCase
+import com.mateus.orders.domain.use_case.make_order.IMakeOrderUseCase
 import com.mateus.orders.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -19,10 +20,14 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val listCategoriesUseCase: IListCategoriesUseCase,
-    private val listProductsUseCase: IListProductsUseCase
+    private val listProductsUseCase: IListProductsUseCase,
+    private val makeOrderUseCase: IMakeOrderUseCase,
+    private val addOrderItemUseCase: IAddOrderItemUseCase
 ) : ViewModel() {
     private val categories: MutableStateFlow<Resource<List<Category>>> = MutableStateFlow(Resource.Loading())
     private val products: MutableStateFlow<Resource<List<Product>>> = MutableStateFlow(Resource.Loading())
+    private val currentOrderId: MutableStateFlow<Resource<Int>> = MutableStateFlow(Resource.Loading())
+    private val addOrderItemState: MutableStateFlow<Resource<Boolean>> = MutableStateFlow(Resource.Loading())
     private val categoriesToFilter = mutableListOf<Int>()
 
     init {
@@ -32,6 +37,22 @@ class HomeViewModel @Inject constructor(
             }
             launch {
                 loadProducts()
+            }
+            launch {
+                loadOrderId()
+            }
+        }
+    }
+
+    fun addOrderItem(productId: Int) {
+        addOrderItemState.value = Resource.Loading()
+        viewModelScope.launch(Dispatchers.IO) {
+            currentOrderId.value.data?.let { orderId ->
+                addOrderItemUseCase(
+                    orderId, productId
+                ).collect { success ->
+                    addOrderItemState.value = success
+                }
             }
         }
     }
@@ -58,6 +79,14 @@ class HomeViewModel @Inject constructor(
         return products.asStateFlow()
     }
 
+    fun getCurrentOrderId() : StateFlow<Resource<Int>> {
+        return currentOrderId.asStateFlow()
+    }
+
+    fun getAddOrderItemState() : StateFlow<Resource<Boolean>> {
+        return addOrderItemState.asStateFlow()
+    }
+
     private suspend fun loadCategories() {
         listCategoriesUseCase().collect { categoriesFlow ->
             categories.value = categoriesFlow
@@ -67,6 +96,12 @@ class HomeViewModel @Inject constructor(
     private suspend fun loadProducts() {
         listProductsUseCase(categoriesToFilter).collect { productsFlow ->
             products.value = productsFlow
+        }
+    }
+
+    private suspend fun loadOrderId() {
+        makeOrderUseCase().collect { orderResource ->
+            currentOrderId.value = orderResource
         }
     }
 }

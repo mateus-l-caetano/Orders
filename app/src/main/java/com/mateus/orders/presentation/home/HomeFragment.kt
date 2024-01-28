@@ -5,13 +5,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.transition.Hold
-import com.google.android.material.transition.MaterialContainerTransform
 import com.google.android.material.transition.MaterialElevationScale
 import com.mateus.orders.databinding.FragmentHomeBinding
 import com.mateus.orders.domain.model.Category
@@ -28,6 +27,9 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: HomeViewModel by viewModels()
+
+//    private lateinit var addOrderItemStateObserver:
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +58,43 @@ class HomeFragment : Fragment() {
                     getProducts(productsDataSet)
                 }
 
+                launch {
+                    viewModel.getCurrentOrderId().collect { orderIdResource ->
+                        when(orderIdResource) {
+                            is Resource.Success -> {
+                                Toast.makeText(context, "Pedido atual carregado", Toast.LENGTH_LONG).show()
+                            }
+                            is Resource.Error -> {
+                                Toast.makeText(context, "${orderIdResource.message}", Toast.LENGTH_LONG).show()
+                            }
+                            is Resource.Loading -> {
+//                                Toast.makeText(context, "Carregando pedido atual", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                }
+
             }
         }
+
+//        val addOrderItemStateObserver = viewModel.getAddOrderItemState().
+//        { wasProductAdded ->
+//            when (wasProductAdded) {
+//                is Resource.Error -> {
+//                    Toast.makeText(context, "${wasProductAdded.message}", Toast.LENGTH_LONG).show()
+//                    Log.d("aaa", "${wasProductAdded.message}")
+//                }
+//                is Resource.Loading -> {
+////                                        Toast.makeText(context, "Adicionando produto", Toast.LENGTH_LONG).show()
+//                }
+//                is Resource.Success -> {
+//                    if(wasProductAdded.data == true)
+//                        Toast.makeText(context, "Produto adicionado com sucesso", Toast.LENGTH_LONG).show()
+//                    else
+//                        Toast.makeText(context, "Não foi possível adicionar o produto", Toast.LENGTH_LONG).show()
+//                }
+//            }
+//        }
 
         return view
     }
@@ -65,8 +102,12 @@ class HomeFragment : Fragment() {
     private suspend fun getCategories(categoriesDataSet: MutableList<Category>) {
         viewModel.getCategories().collect { categories ->
             when(categories) {
-                is Resource.Loading -> {}
-                is Resource.Error -> {}
+                is Resource.Loading -> {
+//                    Toast.makeText(context, "Carregando categorias", Toast.LENGTH_LONG).show()
+                }
+                is Resource.Error -> {
+                    Toast.makeText(context, "${categories.message}", Toast.LENGTH_LONG).show()
+                }
                 is Resource.Success -> {
                     categoriesDataSet.clear()
                     categoriesDataSet.addAll(categories.data.orEmpty())
@@ -101,7 +142,10 @@ class HomeFragment : Fragment() {
                     productsDataSet.clear()
                     productsDataSet.addAll(products.data.orEmpty())
 
-                    val productsAdapter = ProductsAdapter(productsDataSet.toList())
+                    val productsAdapter = ProductsAdapter(productsDataSet.toList()) { productId ->
+                        viewModel.addOrderItem(productId)
+                    }
+
                     val productsRecyclerView = binding.successHomeLayout.productsRecyclerview
                     productsRecyclerView.adapter = productsAdapter
                 }
