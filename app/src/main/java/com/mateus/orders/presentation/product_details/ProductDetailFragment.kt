@@ -51,6 +51,9 @@ class ProductDetailFragment : Fragment() {
                             binding.productDetailTitle.text = product.data?.name
                             binding.productDetailDescription.text = product.data?.description
                             binding.productDetailPrice.text = product.data?.price.toString()
+                            binding.productDetailAddButton.setOnClickListener {
+                                viewModel.addOrderItem(args.productId)
+                            }
                         }
                     }
                 }
