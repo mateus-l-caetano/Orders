@@ -1,6 +1,7 @@
 package com.mateus.orders.data.local.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -18,4 +19,7 @@ interface OrderItemDao {
 
     @Update
     fun updateOrderItem(orderItemEntity: OrderItemEntity)
+
+    @Delete
+    fun removeOrderItem(orderItemEntity: OrderItemEntity)
 }

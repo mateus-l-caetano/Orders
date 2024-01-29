@@ -92,6 +92,17 @@ class CartFragment : Fragment() {
                         },
                         { productId ->
                             viewModel.removeProduct(productId)
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                viewModel.getRemoveOrderItemState().collect { state ->
+                                    when(state) {
+                                        is Resource.Success -> {
+                                            launch { viewModel.loadCartItems() }
+                                        }
+
+                                        else -> {}
+                                    }
+                                }
+                            }
                         }
                     )
 

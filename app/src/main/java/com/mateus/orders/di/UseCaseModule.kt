@@ -10,6 +10,8 @@ import com.mateus.orders.domain.use_case.list_products.IListProductsUseCase
 import com.mateus.orders.domain.use_case.list_products.ListProductsUseCase
 import com.mateus.orders.domain.use_case.make_order.IMakeOrderUseCase
 import com.mateus.orders.domain.use_case.make_order.MakeOrderUseCase
+import com.mateus.orders.domain.use_case.remove_order_item.IRemoveOrderItemUseCase
+import com.mateus.orders.domain.use_case.remove_order_item.RemoveOrderItemUseCase
 import com.mateus.orders.domain.use_case.see_summary.ISeeSummary
 import com.mateus.orders.domain.use_case.see_summary.SeeSummary
 import dagger.Binds
@@ -50,5 +52,10 @@ interface UseCaseModule {
     fun bindSeeSummaryUseCase(
         seeSummary: SeeSummary
     ) : ISeeSummary
+
+    @Binds
+    fun bindRemoveOrderItemUseCase(
+        removeOrderItemUseCase: RemoveOrderItemUseCase
+    ) : IRemoveOrderItemUseCase
 
 }

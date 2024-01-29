@@ -9,4 +9,6 @@ interface IOrderItemRepository {
     suspend fun addNewOrderItem(orderItem: OrderItem) : Long
 
     suspend fun updateOrderItem(orderItem: OrderItem)
+
+    suspend fun removeOrderItem(orderItem: OrderItem)
 }

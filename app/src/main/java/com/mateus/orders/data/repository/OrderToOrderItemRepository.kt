@@ -12,4 +12,8 @@ class OrderToOrderItemRepository @Inject constructor(
     override suspend fun addOrderToOrderItem(orderToOrderItem: OrderToOrderItem) {
         database.orderToOrderItemDao().addOrderToOrderItem(orderToOrderItem.toOrderToOrderItem())
     }
+
+    override suspend fun removeOrderToOrderItem(orderId: Int, productId: Int) {
+        database.orderToOrderItemDao().removeOrderToOrderItem(orderId, productId)
+    }
 }
