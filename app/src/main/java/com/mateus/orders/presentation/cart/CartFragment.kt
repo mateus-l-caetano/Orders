@@ -17,9 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.mateus.orders.data.local.entity.CartItem
 import com.mateus.orders.databinding.FragmentCartBinding
 import com.mateus.orders.presentation.cart.CartItemAdapter.*
+import com.mateus.orders.utils.CurrencyUtils
 import com.mateus.orders.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 @AndroidEntryPoint
 class CartFragment : Fragment() {
@@ -118,6 +120,16 @@ class CartFragment : Fragment() {
 
                     cartAdapter.submitList(cartItemsDataSet)
                     cartAdapter.notifyDataSetChanged()
+
+                    val itemsPrices = mutableListOf<BigDecimal>()
+                    cartItemsDataSet.forEach {
+                        itemsPrices.add(
+                            BigDecimal(it.price)
+                                .multiply(BigDecimal(it.quantity))
+                        )
+                    }
+                    val totalValue = itemsPrices.reduce { sum, totalItem -> sum.plus(totalItem) }
+                    binding.cartTotal.text = CurrencyUtils.calcCurrencyFromBigDecimal(totalValue, 1)
 
                     layoutManager.scrollToPositionWithOffset(firstVisibleItemPosition, topOffset)
                 }
