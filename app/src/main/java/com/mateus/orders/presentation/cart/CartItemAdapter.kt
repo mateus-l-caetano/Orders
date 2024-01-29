@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mateus.orders.data.local.entity.CartItem
 import com.mateus.orders.databinding.ProductCartItemBinding
+import com.mateus.orders.utils.CurrencyUtils
+import java.math.BigDecimal
+import java.text.NumberFormat
 
 class CartItemAdapter(
     private val addProduct: (productId: Int) -> Unit,
@@ -37,7 +40,11 @@ class CartItemAdapter(
         holder.title.text = cartItem.name
         holder.description.text = cartItem.description
         holder.quantity.text = cartItem.quantity.toString()
-        holder.price.text = cartItem.price
+        holder.price.text = CurrencyUtils
+            .calcCurrencyFromBigDecimal(
+                BigDecimal(cartItem.price),
+                cartItem.quantity
+            )
 
         holder.plusButton.tag = cartItem.id
         holder.plusButton.setOnClickListener {

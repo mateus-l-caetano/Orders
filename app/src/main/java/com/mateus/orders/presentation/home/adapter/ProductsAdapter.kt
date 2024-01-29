@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mateus.orders.databinding.ProductItemBinding
 import com.mateus.orders.domain.model.Product
 import com.mateus.orders.presentation.home.HomeFragmentDirections
+import com.mateus.orders.utils.CurrencyUtils
+import java.math.BigDecimal
 
 class ProductsAdapter(
     private val dataSet: List<Product>,
@@ -53,7 +55,9 @@ class ProductsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.productTitle.text = dataSet[position].name
         holder.productDescription.text = dataSet[position].description
-        holder.productPrice.text = dataSet[position].price.toString()
+        holder.productPrice.text = CurrencyUtils.calcCurrencyFromBigDecimal(
+            dataSet[position].price, 1
+        )
         holder.productImage.transitionName = "shared_element${dataSet[position].id}"
 
         holder.productAddButton.tag = dataSet[position].id

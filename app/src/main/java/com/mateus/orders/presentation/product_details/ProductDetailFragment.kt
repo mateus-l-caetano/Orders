@@ -13,6 +13,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.transition.MaterialContainerTransform
 import com.mateus.orders.databinding.FragmentProductDetailBinding
+import com.mateus.orders.utils.CurrencyUtils
 import com.mateus.orders.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -50,7 +51,10 @@ class ProductDetailFragment : Fragment() {
                         is Resource.Success -> {
                             binding.productDetailTitle.text = product.data?.name
                             binding.productDetailDescription.text = product.data?.description
-                            binding.productDetailPrice.text = product.data?.price.toString()
+                            binding.productDetailPrice.text = product.data?.price?.let {
+                                CurrencyUtils.calcCurrencyFromBigDecimal(
+                                    it, 1)
+                            }
                             binding.productDetailAddButton.setOnClickListener {
                                 viewModel.addOrderItem(args.productId)
                             }
