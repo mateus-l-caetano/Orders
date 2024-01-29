@@ -38,9 +38,9 @@ class HomeViewModel @Inject constructor(
             launch {
                 loadProducts()
             }
-            launch {
-                loadOrderId()
-            }
+//            launch {
+//                loadOrderId()
+//            }
         }
     }
 
@@ -102,6 +102,12 @@ class HomeViewModel @Inject constructor(
     private suspend fun loadOrderId() {
         makeOrderUseCase().collect { orderResource ->
             currentOrderId.value = orderResource
+        }
+    }
+
+    fun loadOrder() {
+        viewModelScope.launch(Dispatchers.IO) {
+            loadOrderId()
         }
     }
 }

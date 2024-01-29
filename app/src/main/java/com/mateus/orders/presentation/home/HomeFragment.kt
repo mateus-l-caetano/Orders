@@ -59,6 +59,7 @@ class HomeFragment : Fragment() {
                     getCurrentOrder()
                 }
 
+                viewModel.loadOrder()
             }
         }
 
