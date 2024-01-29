@@ -5,59 +5,56 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.mateus.orders.data.local.entity.CartItem
 import com.mateus.orders.databinding.ProductCartItemBinding
 
 class CartItemAdapter(
-    private val dataSet: List<CartItem>,
     private val addProduct: (productId: Int) -> Unit,
     private val removeProduct: (productId: Int) -> Unit
-) : RecyclerView.Adapter<CartItemAdapter.ViewHolder>() {
-    class ViewHolder(binding: ProductCartItemBinding) : RecyclerView.ViewHolder(binding.root){
-        val title: TextView
-        val description: TextView
-        val price: TextView
-        val quantity: TextView
-        val plusButton: Button
-        val minusButton: Button
+) : ListAdapter<CartItem, CartItemAdapter.ViewHolder>(CartItemDiffCallback()) {
 
-        init {
-            title = binding.productCartItemTitle
-            description = binding.productCartItemDescription
-            price = binding.productCartItemPrice
-            quantity = binding.productCartItemQuantity
-            plusButton = binding.productCartItemPlusButton
-            minusButton = binding.productCartItemMinusButton
-        }
+    class ViewHolder(binding: ProductCartItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        val title: TextView = binding.productCartItemTitle
+        val description: TextView = binding.productCartItemDescription
+        val price: TextView = binding.productCartItemPrice
+        val quantity: TextView = binding.productCartItemQuantity
+        val plusButton: Button = binding.productCartItemPlusButton
+        val minusButton: Button = binding.productCartItemMinusButton
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ProductCartItemBinding.inflate(inflater, parent, false)
-        val holder = ViewHolder(binding)
-
-        holder.plusButton.setOnClickListener {
-            val productId = it.tag as Int
-            Log.d("aaa", "adding product button")
-            addProduct(productId)
-        }
-
-        return holder
+        return ViewHolder(binding)
     }
 
-    override fun getItemCount() = dataSet.size
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.title.text = dataSet[position].name
-        holder.description.text = dataSet[position].description
-        holder.quantity.text = dataSet[position].quantity.toString()
-        holder.price.text = dataSet[position].price
+        val cartItem = getItem(position)
 
-        holder.plusButton.tag = dataSet[position].id
+        holder.title.text = cartItem.name
+        holder.description.text = cartItem.description
+        holder.quantity.text = cartItem.quantity.toString()
+        holder.price.text = cartItem.price
+
+        holder.plusButton.tag = cartItem.id
+        holder.plusButton.setOnClickListener {
+            Log.d("aaa", "adding product button")
+            addProduct(cartItem.id)
+        }
 
         holder.minusButton.setOnClickListener {
-            removeProduct(dataSet[position].id)
+            removeProduct(cartItem.id)
         }
+    }
+
+    class CartItemDiffCallback : DiffUtil.ItemCallback<CartItem>() {
+        override fun areItemsTheSame(oldItem: CartItem, newItem: CartItem): Boolean =
+            oldItem.id == newItem.id
+
+        override fun areContentsTheSame(oldItem: CartItem, newItem: CartItem): Boolean =
+            oldItem == newItem
     }
 }

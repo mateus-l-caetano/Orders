@@ -12,8 +12,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.mateus.orders.data.local.entity.CartItem
 import com.mateus.orders.databinding.FragmentCartBinding
+import com.mateus.orders.presentation.cart.CartItemAdapter.*
 import com.mateus.orders.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -55,6 +58,47 @@ class CartFragment : Fragment() {
 
     private suspend fun getCart() {
         val cartItemsDataSet = mutableListOf<CartItem>()
+        val cartRecyclerView = binding.cartRecyclerview
+
+        val cartAdapter = CartItemAdapter(
+            { productId ->
+                viewModel.addProduct(productId)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.getAddOrderItemState().collect{ state ->
+                        when(state) {
+                            is Resource.Success -> {
+                                Log.d("aaa", "adicionado com sucesso")
+                                launch { viewModel.loadCartItems() }
+                            }
+
+                            is Resource.Error -> {
+                                Log.d("aaa", "deu ruim")
+                            }
+                            is Resource.Loading -> {
+                                Log.d("aaa", "carregando")
+                            }
+                        }
+                    }
+                }
+            },
+            { productId ->
+                viewModel.removeProduct(productId)
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewModel.getRemoveOrderItemState().collect { state ->
+                        when(state) {
+                            is Resource.Success -> {
+                                launch { viewModel.loadCartItems() }
+                            }
+
+                            else -> {}
+                        }
+                    }
+                }
+            }
+        )
+
+        cartRecyclerView.adapter = cartAdapter
+
         viewModel.getCartItems().collect { cartItemsListResource ->
             Log.d("aaa", "cart changed")
             when (cartItemsListResource) {
@@ -68,46 +112,14 @@ class CartFragment : Fragment() {
                         Log.d("aaa", "cart product ${item.name} count ${item.quantity}")
                     }
 
-                    val cartAdapter = CartItemAdapter(
-                        cartItemsDataSet.toList(),
-                        { productId ->
-                            viewModel.addProduct(productId)
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                viewModel.getAddOrderItemState().collect{ state ->
-                                    when(state) {
-                                        is Resource.Success -> {
-                                            Log.d("aaa", "adicionado com sucesso")
-                                            launch { viewModel.loadCartItems() }
-                                        }
+                    val layoutManager = binding.cartRecyclerview.layoutManager as LinearLayoutManager
+                    val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
+                    val topOffset = layoutManager.findViewByPosition(firstVisibleItemPosition)?.top ?: 0
 
-                                        is Resource.Error -> {
-                                            Log.d("aaa", "deu ruim")
-                                        }
-                                        is Resource.Loading -> {
-                                            Log.d("aaa", "carregando")
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        { productId ->
-                            viewModel.removeProduct(productId)
-                            viewLifecycleOwner.lifecycleScope.launch {
-                                viewModel.getRemoveOrderItemState().collect { state ->
-                                    when(state) {
-                                        is Resource.Success -> {
-                                            launch { viewModel.loadCartItems() }
-                                        }
+                    cartAdapter.submitList(cartItemsDataSet)
+                    cartAdapter.notifyDataSetChanged()
 
-                                        else -> {}
-                                    }
-                                }
-                            }
-                        }
-                    )
-
-                    val cartRecyclerView = binding.cartRecyclerview
-                    cartRecyclerView.adapter = cartAdapter
+                    layoutManager.scrollToPositionWithOffset(firstVisibleItemPosition, topOffset)
                 }
             }
         }
