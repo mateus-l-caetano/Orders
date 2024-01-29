@@ -36,6 +36,7 @@ class AddOrderItemUseCase @Inject constructor(
                         orderItem.id, orderItem.quantity + 1, orderItem.productId
                     )
                 )
+                emit(Resource.Success(Any()))
             }
         } catch (e: Exception) {
             emit(Resource.Error(

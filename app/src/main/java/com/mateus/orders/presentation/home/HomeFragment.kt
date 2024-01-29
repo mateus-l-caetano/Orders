@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.findNavController
 import com.google.android.material.transition.MaterialElevationScale
 import com.mateus.orders.databinding.FragmentHomeBinding
 import com.mateus.orders.domain.model.Category
@@ -68,7 +69,13 @@ class HomeFragment : Fragment() {
         viewModel.getCurrentOrderId().collect { orderIdResource ->
             when (orderIdResource) {
                 is Resource.Success -> {
+                    val orderId: Int = orderIdResource.data ?: 0
                     Toast.makeText(context, "Pronto para adicionar itens ao pedido", Toast.LENGTH_SHORT).show()
+                    binding.successHomeLayout.homeTopAppBar.setOnMenuItemClickListener {
+                        val action = HomeFragmentDirections.actionHomeFragmentToCartFragment(orderId)
+                        view?.findNavController()?.navigate(action)
+                        true
+                    }
                 }
 
                 is Resource.Error -> {

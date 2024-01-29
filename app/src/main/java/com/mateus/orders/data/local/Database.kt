@@ -2,6 +2,7 @@ package com.mateus.orders.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.mateus.orders.data.local.dao.CartDao
 import com.mateus.orders.data.local.dao.CategoryDao
 import com.mateus.orders.data.local.dao.OrderDao
 import com.mateus.orders.data.local.dao.OrderItemDao
@@ -32,4 +33,6 @@ abstract class Database: RoomDatabase() {
     abstract fun orderItemDao(): OrderItemDao
 
     abstract fun orderToOrderItemDao(): OrderToOrderItemDao
+
+    abstract fun cartDao(): CartDao
 }

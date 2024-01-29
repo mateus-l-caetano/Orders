@@ -1,10 +1,12 @@
 package com.mateus.orders.di
 
+import com.mateus.orders.data.repository.CartItemsRepository
 import com.mateus.orders.data.repository.CategoryRepository
 import com.mateus.orders.data.repository.OrderItemRepository
 import com.mateus.orders.data.repository.OrderRepository
 import com.mateus.orders.data.repository.OrderToOrderItemRepository
 import com.mateus.orders.data.repository.ProductRepository
+import com.mateus.orders.domain.repository.ICartItemsRepository
 import com.mateus.orders.domain.repository.ICategoryRepository
 import com.mateus.orders.domain.repository.IOrderItemRepository
 import com.mateus.orders.domain.repository.IOrderRepository
@@ -43,5 +45,10 @@ interface RepositoryModule {
     fun bindOrderToOrderItemRepository(
         orderToOrderItemRepository: OrderToOrderItemRepository
     ) : IOrderToOrderItemRepository
+
+    @Binds
+    fun bindCartItemsRepository(
+        cartItemsRepository: CartItemsRepository
+    ) : ICartItemsRepository
 
 }
