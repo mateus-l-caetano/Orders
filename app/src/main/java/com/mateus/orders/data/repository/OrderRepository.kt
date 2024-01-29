@@ -2,6 +2,7 @@ package com.mateus.orders.data.repository
 
 import com.mateus.orders.data.local.Database
 import com.mateus.orders.data.local.entity.toOder
+import com.mateus.orders.data.remote.IFakeRemoteService
 import com.mateus.orders.domain.model.Order
 import com.mateus.orders.domain.model.toOrderEntity
 import com.mateus.orders.domain.repository.IOrderRepository
@@ -10,7 +11,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class OrderRepository @Inject constructor(
-    private val database: Database
+    private val database: Database,
+    private val api: IFakeRemoteService
 ) : IOrderRepository {
     override suspend fun addOrder(order: Order) : Long {
         return database.orderDao()
@@ -24,5 +26,10 @@ class OrderRepository @Inject constructor(
                     it.toOder()
                 else null
             }
+    }
+
+    override suspend fun sendOrder(order: Order) {
+        if(api.makeOrder(order.toOrderEntity()))
+            database.orderDao().updateOrder(order.toOrderEntity())
     }
 }

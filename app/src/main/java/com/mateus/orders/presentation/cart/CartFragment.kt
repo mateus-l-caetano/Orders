@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,11 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.mateus.orders.data.local.entity.CartItem
 import com.mateus.orders.databinding.FragmentCartBinding
-import com.mateus.orders.presentation.cart.CartItemAdapter.*
 import com.mateus.orders.utils.CurrencyUtils
 import com.mateus.orders.utils.Resource
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,6 +38,26 @@ class CartFragment : Fragment() {
 
         binding.cartTopAppBar.setNavigationOnClickListener {
             it.findNavController().popBackStack()
+        }
+
+        binding.cartSendOrderButton.setOnClickListener {
+            viewModel.sendOrder()
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.getSendOrderState().collect { state ->
+                    when(state) {
+                        is Resource.Error -> {
+                            Toast.makeText(context, "Erro ao enviar o pedido: ${state.message}", Toast.LENGTH_LONG).show()
+                            it.findNavController().popBackStack()
+                        }
+                        is Resource.Loading -> {}
+                        is Resource.Success -> {
+                            Toast.makeText(context, "Pedido enviado com sucesso", Toast.LENGTH_LONG).show()
+                            it.findNavController().popBackStack()
+                        }
+                    }
+                }
+            }
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -128,8 +147,13 @@ class CartFragment : Fragment() {
                                 .multiply(BigDecimal(it.quantity))
                         )
                     }
-                    val totalValue = itemsPrices.reduce { sum, totalItem -> sum.plus(totalItem) }
-                    binding.cartTotal.text = CurrencyUtils.calcCurrencyFromBigDecimal(totalValue, 1)
+
+                    if(!itemsPrices.isNullOrEmpty()){
+                        val totalValue = itemsPrices.reduce { sum, totalItem -> sum.plus(totalItem) }
+                        binding.cartTotal.text = CurrencyUtils.calcCurrencyFromBigDecimal(totalValue, 1)
+                    } else {
+                        binding.cartTotal.text = CurrencyUtils.calcCurrencyFromBigDecimal(BigDecimal(0), 1)
+                    }
 
                     layoutManager.scrollToPositionWithOffset(firstVisibleItemPosition, topOffset)
                 }

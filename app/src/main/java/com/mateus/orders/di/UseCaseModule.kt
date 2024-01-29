@@ -14,6 +14,8 @@ import com.mateus.orders.domain.use_case.remove_order_item.IRemoveOrderItemUseCa
 import com.mateus.orders.domain.use_case.remove_order_item.RemoveOrderItemUseCase
 import com.mateus.orders.domain.use_case.see_summary.ISeeSummary
 import com.mateus.orders.domain.use_case.see_summary.SeeSummary
+import com.mateus.orders.domain.use_case.send_order.ISendOrderUseCase
+import com.mateus.orders.domain.use_case.send_order.SendOrderUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -57,5 +59,10 @@ interface UseCaseModule {
     fun bindRemoveOrderItemUseCase(
         removeOrderItemUseCase: RemoveOrderItemUseCase
     ) : IRemoveOrderItemUseCase
+
+    @Binds
+    fun bindSendOrderUseCase(
+        sendOrderUseCase: SendOrderUseCase
+    ) : ISendOrderUseCase
 
 }

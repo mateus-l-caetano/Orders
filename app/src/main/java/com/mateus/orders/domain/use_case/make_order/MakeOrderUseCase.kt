@@ -18,11 +18,15 @@ class MakeOrderUseCase @Inject constructor(
             val currentOrder = repository.getCurrentOrder().firstOrNull()
 
             if (currentOrder == null) {
+                Log.d("aaa", "criando novo pedido")
                 val id = repository.addOrder(Order(0, null)).toInt()
                 if(id >= 0)
                     emit(Resource.Success(id))
-            } else {
+            } else if(currentOrder.date == null) {
+                Log.d("aaa", "pedido já existente")
                 emit(Resource.Success(currentOrder.id))
+            } else {
+                emit(Resource.Error("Erro ao adicionar pedido"))
             }
 
         } catch (e: Exception) {

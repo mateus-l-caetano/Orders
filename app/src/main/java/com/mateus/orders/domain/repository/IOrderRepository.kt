@@ -7,4 +7,6 @@ interface IOrderRepository {
     suspend fun addOrder(order: Order) : Long
 
     suspend fun getCurrentOrder() : Flow<Order?>
+
+    suspend fun sendOrder(order: Order)
 }
